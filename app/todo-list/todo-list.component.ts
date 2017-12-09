@@ -25,69 +25,77 @@ export class TodoListComponent implements OnInit, OnChanges {
   filterTag = "";
   filterState = "all";
   couleurLabel: { label: string, value: string }[] = [{ label : 'Red',    value: 'Red'},
-                                                          { label : 'Orange', value: 'Orange'},
-                                                          { label : 'Green',  value: 'Green'},
-                                                          { label : 'White',  value: 'White'},
-                                                          { label : 'Grey',   value: 'Grey'}];
+    { label : 'Orange', value: 'Orange'},
+    { label : 'Green',  value: 'Green'},
+    { label : 'White',  value: 'White'},
+    { label : 'Grey',   value: 'Grey'}];
   CouleurFiltreLabel: { label: string, value: string }[] = [{ label : 'All',    value: 'All'},
-                                                            { label : 'Red',    value: 'Red'},
-                                                            { label : 'Orange', value: 'Orange'},
-                                                            { label : 'Green',  value: 'Green'},
-                                                            { label : 'White',  value: 'White'},
-                                                            { label : 'Grey',   value: 'Grey'}];
+    { label : 'Red',    value: 'Red'},
+    { label : 'Orange', value: 'Orange'},
+    { label : 'Green',  value: 'Green'},
+    { label : 'White',  value: 'White'},
+    { label : 'Grey',   value: 'Grey'}];
   selectedColor = 'Red';
   filterColor = 'All';
   @ViewChild('name') nameHtmlElement: ElementRef;
   @ViewChild('label') labelHtmlElement: ElementRef;
   @ViewChild('tag') tagHtmlElement: ElementRef;
   toasterconfig: ToasterConfig = new ToasterConfig({
-                                  showCloseButton: true,
-                                  tapToDismiss: false,
-                                  timeout: 2000,
-                                  animation: 'fade'
-                                });
+    showCloseButton: true,
+    tapToDismiss: false,
+    timeout: 2000,
+    animation: 'fade'
+  });
 
   constructor(private todoListService: TodoListService,
               private confirmationService: ConfirmationService,
               private toasterService: ToasterService,
               private _hotkeysService: HotkeysService) {
+    this._hotkeysService.add(new Hotkey('shift+e', (event: KeyboardEvent): boolean => {
+      this.nameHtmlElement.nativeElement.focus();
+      return false; // Prevent bubbling
+    }));
     this._hotkeysService.add(new Hotkey('alt+c', (event: KeyboardEvent): boolean => {
       this.createItem();
       return false; // Prevent bubbling
     }));
     this._hotkeysService.add(new Hotkey('alt+e', (event: KeyboardEvent): boolean => {
-      this.nameHtmlElement.nativeElement.focus();
+      const selectedItem: ItemJSON = this.list.items.find( item => item.data['selected'] === true);
+      if(selectedItem){
+        selectedItem.data["edited"] = true;
+        this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, selectedItem.id, selectedItem.data);
+      }
       return false;
     }));
 
     this._hotkeysService.add(new Hotkey(['down', 'up'], (event: KeyboardEvent): boolean => {
-        let index: number = this.list.items.findIndex( item => item.data["selected"] === true);
-        if (index >= 0 ){
-          this.list.items[index].data["selected"] = false;
-          this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[index].id, this.list.items[index].data);
-          if(event.key === 'ArrowDown') {
-            if(index >= this.list.items.length - 1) {
-              this.list.items[0].data["selected"] = true;
-              this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[0].id, this.list.items[0].data);
-            } else {
-              index++;
-              this.list.items[index].data["selected"] = true;
-              this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[index].id, this.list.items[index].data);
-            }
+      let index: number = this.list.items.findIndex( item => item.data["selected"] === true);
+      if (index >= 0 ){
+        this.list.items[index].data["selected"] = false;
+        this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[index].id, this.list.items[index].data);
+        if(event.key === 'ArrowDown') {
+          if(index >= this.list.items.length - 1) {
+            this.list.items[0].data["selected"] = true;
+            this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[0].id, this.list.items[0].data);
+          } else {
+            index++;
+            this.list.items[index].data["selected"] = true;
+            this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[index].id, this.list.items[index].data);
           }
-          else if (event.key === 'ArrowUp') {
-            if (index === 0 ) {
-              this.list.items[this.list.items.length - 1].data["selected"] = true;
-              const lastIndex = this.list.items.length - 1;
-              this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[lastIndex].id, this.list.items[lastIndex].data);
-            } else {
-              index--;
-              this.list.items[index].data["selected"] = true;
-              this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[index].id, this.list.items[index].data);
-            }
-          }
-
         }
+        else if (event.key === 'ArrowUp') {
+          if (index === 0 ) {
+            this.list.items[this.list.items.length - 1].data["selected"] = true;
+            const lastIndex = this.list.items.length - 1;
+            this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[lastIndex].id, this.list.items[lastIndex].data);
+          } else {
+            index--;
+            this.list.items[index].data["selected"] = true;
+            this.todoListService.SERVER_UPDATE_ITEM_DATA(this.list.id, this.list.items[index].id, this.list.items[index].data);
+          }
+        }
+
+      }
       return false; // Prevent bubbling
     }));
     this._hotkeysService.add(new Hotkey('alt+v', (event: KeyboardEvent): boolean => {
@@ -99,7 +107,6 @@ export class TodoListComponent implements OnInit, OnChanges {
     this._hotkeysService.add(new Hotkey('alt+d', (event: KeyboardEvent): boolean => {
       const selectedItem: ItemJSON = this.list.items.find( item => item.data['selected'] === true);
       if(selectedItem) {
-        this.todoListService.SERVER_DELETE_ITEM(this.list.id, selectedItem.id);
         this.onItemDelete(selectedItem.id);
       }
       return false; // Prevent bubbling
@@ -179,8 +186,19 @@ export class TodoListComponent implements OnInit, OnChanges {
   }
 
   onItemDelete(id: ItemID) {
-        this.list.items.splice(this.list.items.findIndex(item => item.id === id), 1);
-        this.filteredItems.splice(this.filteredItems.findIndex(item => item.id === id), 1);
+    this.confirmationService.confirm({
+      message: 'Etes-vous sur de vouloir continuer?',
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      key: 'deleteItem',
+      accept: () => {
+        this.toasterService.pop('success', 'Détails', 'La suppression a été bien prise en compte.');
+        this.todoListService.SERVER_DELETE_ITEM(this.list.id, id);
+      },
+      reject: () => {
+        this.toasterService.pop('info', 'Détails', 'La suppression a été annulée.');
+      }
+    });
   }
 
   onItemSort($event: any) {

@@ -82,4 +82,19 @@ export class AppComponent implements OnInit {
   showHelp(){
     this.display = true;
   }
+  allRequiredStyles() {
+    let myStyles;
+    if(this.showStyle) {
+      myStyles = {
+        'color':  'white',
+        'background-color': 'black'
+      };
+    } else{
+      myStyles = {
+        'color':  'black',
+        'background-color': 'white'
+      };
+    }
+    return myStyles;
+  };
 }

@@ -28,11 +28,8 @@ export class TodoItemComponent implements OnInit {
   @Output() onItemDelete = new EventEmitter<ItemID>();
   @Output() onItemChange = new EventEmitter<ItemID>();
   @Output() onItemSort = new EventEmitter<any>();
-  private editingLabel = false;
   msgs: Message[] = [];
-  constructor(private todoListService: TodoListService,
-              private confirmationService: ConfirmationService,
-              private toasterService: ToasterService) {
+  constructor(private todoListService: TodoListService) {
   }
 
   ngOnInit() {
@@ -62,11 +59,12 @@ export class TodoItemComponent implements OnInit {
   }
 
   isEditingLabel(): boolean {
-    return this.editingLabel;
+    return this.item.data["edited"];
   }
 
   editLabel(edit: boolean) {
-        this.editingLabel = edit;
+    this.item.data["edited"] = edit;
+    this.todoListService.SERVER_UPDATE_ITEM_DATA(this.listId, this.item.id, this.item.data);
   }
 
   check(checked: boolean) {
@@ -75,23 +73,13 @@ export class TodoItemComponent implements OnInit {
   }
 
   delete() {
-    this.confirmationService.confirm({
-      message: 'Etes-vous sur de vouloir continuer?',
-      header: 'Confirmation',
-      icon: 'fa fa-question-circle',
-      accept: () => {
-        this.toasterService.pop('success', 'Détails', 'La suppression a été bien prise en compte.');
-        this.todoListService.SERVER_DELETE_ITEM(this.listId, this.item.id);
-        this.onItemDelete.emit(this.item.id);
-      },
-      reject: () => {
-        this.toasterService.pop('info', 'Détails', 'La suppression a été annulée.');
-      }
-    });
+    this.onItemDelete.emit(this.item.id);
   }
   editItem(label: string, tag: string) {
     this.setLabel(label);
     this.setTag(tag);
+    this.item.data["edited"] = false;
+    this.todoListService.SERVER_UPDATE_ITEM_DATA(this.listId, this.item.id, this.item.data);
   }
   onDropDataOrder($event: any) {
     $event.newIndex = this.index;

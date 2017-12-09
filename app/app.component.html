@@ -1,21 +1,21 @@
-<!--<header *ngIf="getUser()">-->
-  <!--<section class="user">-->
-    <!--<label>Identifié via {{getUserProvider()}}</label>-->
-    <!--<section class="connection">-->
-      <!--<label *ngIf="getConnected() | async">✅ connecté</label>-->
-      <!--<label *ngIf="!(getConnected() | async)" (click)="tryReconnectSocket()">✗ déconnecté</label>-->
-    <!--</section>-->
-    <!--<label>{{getUserName()}}</label>-->
-    <!--<label>{{getUserMail()}}</label>-->
-  <!--</section>-->
-  <!--<img class="photo" [src]="getUserPhoto()" />-->
-<!--</header>-->
-<body [style.background]="changeBackgroundColor()">
-<div class="container col-8 offset-2 col-xl-6 offset-xl-3 h-100" [style.filter]="getStyle()">
-    <div class="border col-12 text-center mt-3 mb-1 p-3 header">
-      <div style="float: left"><p-inputSwitch onLabel="Foncé" offLabel="Clair" (click)="showStyle = !showStyle"></p-inputSwitch></div>
-      {{title}}
-    </div>
+<!--<header *ngIf="getUser()">
+<section class="user">
+<label>Identifié via {{getUserProvider()}}</label>
+<section class="connection">
+<label *ngIf="getConnected() | async">✅ connecté</label>
+<label *ngIf="!(getConnected() | async)" (click)="tryReconnectSocket()">✗ déconnecté</label>
+</section>
+<label>{{getUserName()}}</label>
+<label>{{getUserMail()}}</label>
+</section>
+<img class="photo" [src]="getUserPhoto()" />
+</header>-->
+<body>
+<div class="container col-8 offset-2 col-xl-6 offset-xl-3 h-100 noPadd" [ngStyle]="allRequiredStyles()">
+  <div class="border col-12 text-center mt-3 mb-1 p-3 header">
+    <div style="float: left"><p-inputSwitch onLabel="Foncé" offLabel="Clair" (click)="showStyle = !showStyle"></p-inputSwitch></div>
+    {{title}}
+  </div>
   <router-outlet></router-outlet>
   <div class="float-right">
     <p-dialog header="Liste des raccourcis" [(visible)]="display" modal="modal" [responsive]="true" appendTo="body">
@@ -37,10 +37,13 @@
           <td>Shift+d</td> <td>Dupliquer une liste.</td>
         </tr>
         <tr>
-          <td>Tab</td> <td>Parcourir les listes</td>
+          <td>Shift+e</td> <td>Renommer une liste.</td>
         </tr>
         <tr>
-          <td>Shift+Tab</td> <td>Parcourir les listes dans le sens inverse</td>
+          <td>Tab</td> <td>Déplacer vers la liste suivante.</td>
+        </tr>
+        <tr>
+          <td>Shift+Tab</td> <td>Déplacer vers la liste précedente.</td>
         </tr>
         </tbody>
       </table>
@@ -78,5 +81,5 @@
     </p-dialog>
     <button type="button" (click)="showHelp()" pButton class="btn btn-circle btn-lg float-right question" icon="fa fa-question-circle-o" style="font-size: 50px;"></button><br>
   </div>
-  </div>
+</div>
 </body>

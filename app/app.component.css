@@ -37,12 +37,6 @@ section.connection > label:hover {
   height: 6%;
 }
 
-.normal{
-  filter: invert(0%);
-}
-.inverse{
-  filter: invert(100%);
-}
 
 .btn-circle {
   width: 30px;
@@ -71,4 +65,8 @@ section.connection > label:hover {
 }
 .question{
   right: -500%;
+}
+.noPadd{
+  padding-left: 0px;
+  padding-right: 0px;
 }

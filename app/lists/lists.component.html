@@ -6,8 +6,9 @@
          [dragHintClass]="'big-glyphicon'" (click)="deleteLists()" (onDrop)="onDropDataDelete($event)"></i>
     </form>
     <hr class="separator"/>
-    <div *ngFor="let list of getLists(); let i = index; let last = last" [ngClass]="{'listeSel': selectedList===list}">
+    <div *ngFor="let list of getLists(); let i = index; let last = last">
       <div droppable [dropScope]="'list'" (onDrop)="onDropDataOrder($event,i)" [dragOverClass]="'onDrop'" [dragHintClass]="'onDropStarted'"></div>
+      <i *ngIf="selectedList===list" class="fa fa-hand-o-right"></i>
       <input type="checkbox" [ngModel]="list.data['checked']" (change)="checkList(list, $event)"/>
       <span (click)="selectList(list)" draggable [dragScope]="'list'" [dragData]="list">{{list.name}}</span>
       <div *ngIf="last" droppable [dropScope]="'list'" (onDrop)="onDropDataOrder($event,i+1)" [dragOverClass]="'onDrop'" [dragHintClass]="'onDropStarted'"></div>
